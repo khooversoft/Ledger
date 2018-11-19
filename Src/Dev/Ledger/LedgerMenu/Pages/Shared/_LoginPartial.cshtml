@@ -1,14 +1,45 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    <ul class="nav navbar-nav navbar-right">
-        <li class="navbar-text">Hello @User.Identity.Name!</li>
-        <li><a asp-area="AzureAD" asp-controller="Account" asp-action="SignOut">Sign out</a></li>
+    string userName = User.FindFirst(x => x.Type == "name")?.Value ?? User.Identity.Name;
+
+    <ul class="nav navbar-top-links navbar-right">
+        <!-- /.dropdown -->
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-user">
+                <li><p>@userName</p></li>
+                <li class="divider"></li>
+                <li>
+                    <a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                </li>
+                <li>
+                    <a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
+                </li>
+                <li class="divider"></li>
+                <li>
+                    <a asp-area="AzureAD" asp-controller="Account" asp-action="SignOut">
+                        <i class="fa fa-sign-out fa-fw"></i>Sign out
+                    </a>
+                </li>
+            </ul>
+            <!-- /.dropdown-user -->
+        </li>
+        <!-- /.dropdown -->
     </ul>
 }
 else
 {
-    <ul class="nav navbar-nav navbar-right">
-        <li><a asp-area="AzureAD" asp-controller="Account" asp-action="SignIn">Sign in</a></li>
+    <ul class="nav navbar-top-links navbar-right">
+        <!-- /.dropdown -->
+        <li class="dropdown">
+            <a asp-area="AzureAD" asp-controller="Account" asp-action="SignIn">
+                <i class="fa fa-sign-in fa-fw"></i>Sign in
+            </a>
+            <!-- /.dropdown-user -->
+        </li>
+        <!-- /.dropdown -->
     </ul>
 }

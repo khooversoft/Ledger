@@ -1,0 +1,96 @@
+﻿@page
+@model LedgerMenu.Pages.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<link href="~/lib/bootstrap-social/bootstrap-social.css" rel="stylesheet" />
+
+<div id="login-overlay" class="modal-dialog modal-sm">
+    <div class="modal-content">
+        <div class="modal-header">
+            @*<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>*@
+            <h4 class="modal-title" id="myModalLabel">Login</h4>
+        </div>
+        <div class="modal-body" style="margin: 2px 10px 2px 10px">
+            <div class="row">
+                <div class="well">
+                    <a class="btn btn-block btn-social btn-microsoft">
+                        <span class="fa fa-windows"></span> Sign in with Microsoft
+                    </a>
+
+                    <a class="btn btn-block btn-social btn-facebook">
+                        <span class="fa fa-twitter"></span> Sign in with Facebook
+                    </a>
+
+                    <a class="btn btn-block btn-social btn-google-plus">
+                        <span class="fa fa-google"></span> Sign in with Google
+                    </a>
+                </div>
+                @*<div class="col-xs-6">*@
+                <div class="well">
+                    <form id="loginForm" method="POST" action="/login/" novalidate="novalidate">
+                        <div class="form-group">
+                            <label for="username" class="control-label">User name</label>
+                            <input type="text" class="form-control" id="username" name="username" value="" required="" title="Please enter you user name" placeholder="example@gmail.com">
+                            <span class="help-block"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="password" class="control-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" value="" required="" title="Please enter your password">
+                            <span class="help-block"></span>
+                        </div>
+                        <div id="loginErrorMsg" class="alert alert-error hide">Wrong user name or password</div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="remember" id="remember"> Remember login
+                            </label>
+                            <p class="help-block">(if this is a private computer)</p>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block">Login</button>
+                        <a href="/forgot/" class="btn btn-default btn-block">Help to login</a>
+                    </form>
+                </div>
+
+                @*</div>*@
+
+                @*<div class="col-xs-4">
+            <p class="lead">Register now for <span class="text-success">FREE</span></p>
+            <ul class="list-unstyled" style="line-height: 2">
+                <li><span class="fa fa-check text-success"></span> Manage subscriptions</li>
+                <li><span class="fa fa-check text-success"></span> Manage contracts</li>
+                <li><span class="fa fa-check text-success"></span> Ledger accounting</li>
+                <li><a href="/read-more/"><u>Read more</u></a></li>
+            </ul>
+            <form id="createAccountForm" method="POST" action="/login/" novalidate="novalidate">
+                <div class="form-group">
+                    <label for="username" class="control-label">User name</label>
+                    <input type="text" class="form-control" id="username" name="username" value="" required="" title="Please enter you user name" placeholder="example@gmail.com">
+                    <span class="help-block"></span>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="control-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" value="" required="" title="Please enter your password">
+                    <span class="help-block"></span>
+                </div>
+                <div class="form-group">
+                    <label for="verifyPassword" class="control-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirmPassword" name="password" value="" required="" title="Please confirm your password">
+                    <span class="help-block"></span>
+                </div>
+                <div id="passwordNotMatch" class="alert alert-error hide">Password does not match</div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="remember" id="remember"> Accept Terms and Conditions
+                    </label>
+                    <p class="help-block">
+                        <small>By clicking <strong class="label label-primary">Register</strong>, you agree to the <a href="#" data-toggle="modal" data-target="#t_and_c_m">Terms and Conditions</a> set out by this site, including our Cookie Use.</small>
+                    </p>
+                </div>
+                <button type="submit" class="btn btn-success btn-block">Register</button>
+            </form>
+        </div>*@
+            </div>
+        </div>
+    </div>
+</div>
