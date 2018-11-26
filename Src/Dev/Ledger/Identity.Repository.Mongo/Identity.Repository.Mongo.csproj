@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="2.7.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Toolbox\SrcCore\Dev\Khooversoft.Toolbox\Khooversoft.MongoDb\Khooversoft.MongoDb.csproj" />
+    <ProjectReference Include="..\..\..\..\..\Toolbox\SrcCore\Dev\Khooversoft.Toolbox\Khooversoft.Toolbox\Khooversoft.Toolbox.csproj" />
+  </ItemGroup>
+
+</Project>
