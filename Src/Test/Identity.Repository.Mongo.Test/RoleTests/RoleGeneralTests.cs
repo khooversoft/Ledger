@@ -124,12 +124,8 @@ namespace Identity.Repository.Mongo.Test.RoleTests
             testDoc.Claims.First().Issuer = newIssuerText;
             docs.Payload.Claims.First().Issuer = newIssuerText;
 
-            Func<Task> func = async () =>
-            {
-                status = await Utility.RoleRepository.Set(Utility.Context, testDoc, "fake");
-            };
-
-            func.Should().Throw<ETagException>();
+            status = await Utility.RoleRepository.Set(Utility.Context, testDoc, "fake");
+            status.Should().BeFalse();
 
             await Utility.RoleRepository.Delete(Utility.Context, testDoc.RoleId);
         }

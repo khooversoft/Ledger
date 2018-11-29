@@ -30,7 +30,7 @@ namespace Identity.Repository.Mongo
             _tag = new Tag($"{nameof(RoleRepository)}/{_configuration.DatabaseName}/{_configuration.IdentityRoleCollectionName}");
         }
 
-        public Task Delete(IWorkContext context, string roleId)
+        public Task<int> Delete(IWorkContext context, string roleId, string eTag = null)
         {
             Verify.IsNotNull(nameof(context), context);
             Verify.IsNotEmpty(nameof(roleId), roleId);
@@ -38,6 +38,11 @@ namespace Identity.Repository.Mongo
 
             var query = new And()
                 + (new Field(HeaderDoc.FieldName(nameof(UserRoleDoc.RoleId))) == roleId);
+
+            if (eTag.IsNotEmpty())
+            {
+                query += (new Field(nameof(HeaderDoc<UserRoleDoc>.ETag)) == eTag);
+            }
 
             return _collection.Delete(context, query.ToDocument());
         }
@@ -98,23 +103,16 @@ namespace Identity.Repository.Mongo
 
             var envelope = new HeaderDoc<UserRoleDoc>(userRole);
 
+            var query = new And()
+                + (new Field(HeaderDoc.FieldName(nameof(UserRoleDoc.RoleId))) == userRole.RoleId);
+
             if (eTag.IsEmpty())
             {
-                await _collection.Insert(context, envelope).ConfigureAwait(false);
-                return true;
+                return await _collection.Upsert(context, query.ToDocument(), envelope).ConfigureAwait(false);
             }
 
-            var query = new And()
-                + (new Field(HeaderDoc.FieldName(nameof(UserRoleDoc.RoleId))) == userRole.RoleId)
-                + (new Field(nameof(HeaderDoc<UserRoleDoc>.ETag)) == eTag);
-
-            bool result = await _collection.Update(context, query.ToDocument(), envelope).ConfigureAwait(false);
-            if (!result)
-            {
-                throw new ETagException($"UserRole.RoleId={userRole.RoleId} is not up to date, request eTag={eTag}", context);
-            }
-
-            return result;
+            query += (new Field(nameof(HeaderDoc<UserRoleDoc>.ETag)) == eTag);
+            return await _collection.Update(context, query.ToDocument(), envelope).ConfigureAwait(false);
         }
     }
 }

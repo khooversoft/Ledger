@@ -30,7 +30,7 @@ namespace Identity.Repository.Mongo
             _tag = new Tag($"{nameof(UserRepository)}/{_configuration.DatabaseName}/{_configuration.IdentityRoleCollectionName}");
         }
 
-        public Task Delete(IWorkContext context, string userName)
+        public Task<int> Delete(IWorkContext context, string userName, string eTag = null)
         {
             Verify.IsNotNull(nameof(context), context);
             Verify.IsNotEmpty(nameof(userName), userName);
@@ -38,6 +38,11 @@ namespace Identity.Repository.Mongo
 
             var query = new And()
                 + (new Field(HeaderDoc.FieldName(nameof(UserDoc.NormalizedUserName))) == userName.ToLowerInvariant());
+
+            if (eTag.IsNotEmpty())
+            {
+                query += (new Field(nameof(HeaderDoc<UserDoc>.ETag)) == eTag);
+            }
 
             return _collection.Delete(context, query.ToDocument());
         }
@@ -99,23 +104,16 @@ namespace Identity.Repository.Mongo
             userDoc.NormalizedUserName = userDoc.UserName.ToLowerInvariant();
             var envelope = new HeaderDoc<UserDoc>(userDoc);
 
+            var query = new And()
+                + (new Field(HeaderDoc.FieldName(nameof(UserDoc.NormalizedUserName))) == userDoc.NormalizedUserName);
+
             if (eTag.IsEmpty())
             {
-                await _collection.Insert(context, envelope).ConfigureAwait(false);
-                return true;
+                return await _collection.Upsert(context, query.ToDocument(), envelope).ConfigureAwait(false);
             }
 
-            var query = new And()
-                + (new Field(HeaderDoc.FieldName(nameof(UserDoc.NormalizedUserName))) == userDoc.NormalizedUserName)
-                + (new Field(nameof(HeaderDoc<UserDoc>.ETag)) == eTag);
-
-            bool result = await _collection.Update(context, query.ToDocument(), envelope).ConfigureAwait(false);
-            if (!result)
-            {
-                throw new ETagException($"userDoc.NormalizedUserName={userDoc.NormalizedUserName} is not up to date, request eTag={eTag}", context);
-            }
-
-            return result;
+            query += (new Field(nameof(HeaderDoc<UserDoc>.ETag)) == eTag);
+            return await _collection.Update(context, query.ToDocument(), envelope).ConfigureAwait(false);
         }
     }
 }

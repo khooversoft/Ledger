@@ -8,7 +8,7 @@ namespace Identity.Repository.Mongo
 {
     public interface IUserRepository
     {
-        Task Delete(IWorkContext context, string userName);
+        Task<int> Delete(IWorkContext context, string userName, string eTag = null);
 
         Task<HeaderDoc<UserDoc>> Get(IWorkContext context, string userName);
 

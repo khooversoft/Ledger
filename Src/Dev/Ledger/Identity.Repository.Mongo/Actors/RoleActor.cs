@@ -1,62 +1,64 @@
-﻿//using Khooversoft.MongoDb;
-//using Khooversoft.Toolbox;
-//using Khooversoft.Toolbox.Actor;
-//using System;
-//using System.Collections.Generic;
-//using System.Text;
-//using System.Threading.Tasks;
+﻿using Khooversoft.MongoDb;
+using Khooversoft.Toolbox;
+using Khooversoft.Toolbox.Actor;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 
-//namespace Identity.Repository.Mongo
-//{
-//    public interface IRoleActor
-//    {
-//        Task Set(IWorkContext context, UserRoleDoc userRole);
+namespace Identity.Repository.Mongo
+{
+    public class RoleActor : ActorBase, IRoleActor
+    {
+        private readonly CacheObject<HeaderDoc<UserRoleDoc>> _cache = new CacheObject<HeaderDoc<UserRoleDoc>>(TimeSpan.FromMinutes(10));
+        private readonly IRoleRepository _roleRepository;
 
-//        Task<UserRoleDoc> Get(IWorkContext context);
+        public RoleActor(ActorKey actorKey, IActorManager actorManager, IRoleRepository roleRepository)
+            : base(actorKey, actorManager)
+        {
+            Verify.IsNotNull(nameof(roleRepository), roleRepository);
 
-//        Task Delete(IWorkContext context);
+            _roleRepository = roleRepository;
 
-//        Task<PageResult<UserRoleDoc>> List(IWorkContext context, PageRequest pageRequest);
-//    }
+        }
 
-//    public class RoleActor : ActorBase, IRoleActor
-//    {
-//        private readonly CacheObject<UserRoleDoc> _cacheUser = new CacheObject<UserRoleDoc>(TimeSpan.FromMinutes(10));
-//        private readonly IIdentityConfiguration _configuration;
-//        private readonly IRoleRepository _roleRepository;
+        public Task<int> Delete(IWorkContext context, string eTag = null)
+        {
+            if (eTag.IsEmpty() && _cache.TryGetValue(out HeaderDoc<UserRoleDoc> value))
+            {
+                eTag = value?.ETag;
+            }
 
-//        public RoleActor(ActorKey actorKey, IActorManager actorManager, IRoleRepository roleRepository)
-//            : base(actorKey, actorManager)
-//        {
-//            Verify.IsNotNull(nameof(roleRepository), roleRepository);
+            _cache.Clear();
+            return _roleRepository.Delete(context, ActorKey.VectorKey, eTag);
+        }
 
-//            _roleRepository = roleRepository;
-           
-//        }
+        public async Task<HeaderDoc<UserRoleDoc>> Get(IWorkContext context)
+        {
+            if (_cache.TryGetValue(out HeaderDoc<UserRoleDoc> value))
+            {
+                return value;
+            }
 
-//        public Task Delete(IWorkContext context)
-//        {
-//            _cacheUser.Clear();
+            HeaderDoc<UserRoleDoc> result = await _roleRepository.Get(context, ActorKey.VectorKey);
+            if (result == null)
+            {
+                return null;
+            }
 
-//            var query = new And()
-//                + (new Field(nameof(UserRoleDoc.RoleId)) == ActorKey.VectorKey);
+            _cache.Set(result);
+            return result;
+        }
 
-//            return _documentServer.
-//        }
+        public async Task<bool> Set(IWorkContext context, UserRoleDoc userRole, string eTag = null)
+        {
+            if (eTag.IsEmpty() && _cache.TryGetValue(out HeaderDoc<UserRoleDoc> value))
+            {
+                eTag = value?.ETag;
+            }
 
-//        public Task<UserRoleDoc> Get(IWorkContext context)
-//        {
-//            throw new NotImplementedException();
-//        }
-
-//        public Task<PageResult<UserRoleDoc>> List(IWorkContext context, PageRequest pageRequest)
-//        {
-//            throw new NotImplementedException();
-//        }
-
-//        public Task Set(IWorkContext context, UserRoleDoc userRole)
-//        {
-//            throw new NotImplementedException();
-//        }
-//    }
-//}
+            _cache.Clear();
+            return await _roleRepository.Set(context, userRole, eTag);
+        }
+    }
+}

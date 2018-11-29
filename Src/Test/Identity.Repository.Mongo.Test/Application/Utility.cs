@@ -14,7 +14,6 @@ namespace Identity.Repository.Mongo.Test
         private const string _dbName = "TestIdentityDatabase";
         private static IActorManager _actorManager = new ActorManager();
         private static readonly object _lock = new object();
-        //private static readonly Tag _tag = new Tag(nameof(Utility));
 
         public static IWorkContext Context { get; } = WorkContext.Empty;
 

@@ -123,12 +123,8 @@ namespace Identity.Repository.Mongo.Test.RoleTests
             testDoc.Email = newIssuerText;
             docs.Payload.Email = newIssuerText;
 
-            Func<Task> func = async () =>
-            {
-                status = await Utility.UserRepository.Set(Utility.Context, testDoc, "fake");
-            };
-
-            func.Should().Throw<ETagException>();
+            status = await Utility.UserRepository.Set(Utility.Context, testDoc, "fake");
+            status.Should().BeFalse();
 
             await Utility.UserRepository.Delete(Utility.Context, testDoc.UserName);
         }
